@@ -14,7 +14,7 @@ github_token = os.environ.get('GITHUB_TOKEN', None)
 
 
 advisory_cluster_api = "https://art-dash-server-art-dashboard-server.apps.artc2023.pc3z.p1.openshiftapps.com/api/v1/errata/advisory/?type=advisory&id="
-redis_client = redis.Redis(host="localhost", port=6379, password=redis_password, ssl=True, decode_responses=True)
+#redis_client = redis.Redis(host="localhost", port=6379, password=redis_password, ssl=True, decode_responses=True)
 
 github_client = Github(github_token)
 cincinnati_repo = github_client.get_repo("openshift/cincinnati-graph-data")
@@ -42,15 +42,15 @@ while minor > 0:
         release_config = yaml.load(ocp_build_data.get_contents("releases.yml", ref=f"openshift-{major}.{minor}").decoded_content,Loader=yaml.FullLoader)
         advisories = release_config['releases'][assembly]['assembly']['group']['advisories']
         for ad in advisories:
-            status_in_redis = redis_client.get(advisories[ad])
+            #status_in_redis = redis_client.get(advisories[ad])
             if status_in_redis == "SHIPPED_LIVE" or status_in_redis == "DROPPED_NO_SHIP":
                 continue
             else:
                 res = requests.get(f"{advisory_cluster_api}{advisories[ad]}")
                 errata_state = res.json()['data']['advisory_details'][0]['status']
                 if errata_state != status_in_redis:
-                    redis_client.delete(advisories[ad])
-                    redis_client.setex(advisories[ad], 60*60*24*7, errata_state)
+                    #redis_client.delete(advisories[ad])
+                    #redis_client.setex(advisories[ad], 60*60*24*7, errata_state)
                     status.append(f"{assembly} {ad} advisory {advisories[ad]} changed to {errata_state} and release date is {release_date}\n")
         minor = minor - 1
     else:
