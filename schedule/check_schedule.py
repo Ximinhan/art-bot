@@ -5,7 +5,7 @@ import redis
 import yaml
 from github import Github
 from datetime import datetime
-from slack_sdk.web.async_client import AsyncWebClient
+from slack_sdk import WebClient
 
 slack_token = os.environ.get('SLACK_TOKEN', None)
 redis_host = os.environ.get('REDIS_HOST', 'localhost')
@@ -61,5 +61,5 @@ if status:
     for state in status:
         print(state)
     if slack_token:
-        response = await AsyncWebClient(token=slack_token).chat_postMessage(
+        response = WebClient(token=slack_token).chat_postMessage(
             channel="#art-dev", text=''.join(status), thread_ts=None, username="art-release-bot", link_names=True, attachments=[], icon_emoji=":robot_face:", reply_broadcast=False)
